@@ -64,6 +64,12 @@ var main = function (toDoObjects) {
 
 
         $(element).on("click", function () {
+            toDos = toDoObjects.map(function (toDo) {
+                // просто возвращаем описание
+                // этой задачи
+                return toDo.description;
+        
+            });
             var $element = $(element),
                 $content;
             $(".tabs a span").removeClass("active");
@@ -103,11 +109,11 @@ var main = function (toDoObjects) {
             } else if ($element.parent().is(":nth-child(4)")) {
 
                 $(".content").append("<p>");
-                $(".content").append("<h3>Клиент: </h3>");
+                $(".content").append("<h3>Информация: </h3>");
                 $(".content").append("<input id='description'>");
                 $(".content").append("<br>");
                 $(".content").append("<p>");
-                $(".content").append("<h3>Дата посещения: </h3>");
+                $(".content").append("<h3>Описание: </h3>");
                 $(".content").append("<input id='tags'>");
                 $(".content").append("<p>");
                 $(".content").append("<button>Добавить</button>");
@@ -130,26 +136,28 @@ var main = function (toDoObjects) {
         var newTags = $("#tags").val().replace(/\s/g, "").split(',');
 
         var result = updateJson(toDoObjects, newDescription, newTags);
+
+        
     });
     $(".tabs a:first-child span").trigger("click");
 
 
     function updateJson(toDoObjects, newDescription, newTags) {
-        var newJsonObject = function (description, tags) {
-            this.description = description;
-            this.tags = tags
+        var newJsonObject =  {
+            "description" : newDescription,
+            "tags" : newTags
         }
-        var newJson = new newJsonObject(newDescription, newTags);
-        toDoObjects.push(newJson);
+        $.post("/klients", newJsonObject, function () {});
+        toDoObjects.push(newJsonObject);
         alert("Предложение успешно добавлено в список!");
-
         return toDoObjects;
     }
 
 };
 function loadbody() {
     $(document).ready(function () {
-        $.getJSON("todos.json", function (toDoObjects) {
+        $.ajaxSetup({ cache: false });
+        $.getJSON("/klients", function (toDoObjects) {
             main(toDoObjects);
 
         });
